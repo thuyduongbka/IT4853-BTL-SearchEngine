@@ -6,12 +6,13 @@
             </div>
             <form @submit="submit">
                 <label></label>
-                <input class="search_input" type="text" placeholder="Type anything ..." />
+                <input v-model="test"  class="search_input" type="text" placeholder="Type anything ..." />
             </form>
+            <p>Thông điệp: {{ test }}</p>
         </form>
         <div class="container-items" v-if="data != null">
             <div class="items">
-                <div class="name-item">{{data.name}}</div>
+                <div class="name-item">{{data}}</div>
             </div>
         </div>
     </div>
@@ -22,28 +23,27 @@ import axios from "axios";
 
 export default {
     name: "SearchHome",
-    data() {
+    data () {
         return {
-            data: null
+            data:null,
+            test:""
         };
     },
     methods: {
-        async submit() {
+        async submit(event) {
             let headers = {
-              'Access-Control-Allow-Origin': '*'
+              'Access-Control-Allow-Origin': '*',
+              "Content-Type": "application/json"
+
             }
-            await axios({
-                method: "get",
-                url: "http://localhost:8983/solr/BTL/select?q=*%3A*&wt=json",
-                headers: headers
-            })
-                .then(function(response) {
-                    console.log(response);
-                    this.data = response.data;
-                })
-                .catch(function(response) {
-                    console.log(response);
-                });            
+            console.log(this.test)
+             event.preventDefault()
+         let res= await axios.get("http://localhost:8983/solr/test/select?indent=on&q=*"+`${this.test}`+"*&wt=json",headers)
+         if(res.status!==200){
+             alert("Đã xảy ra lỗi !!!")
+         }
+         this.data=res
+         console.log(this.data.data.response.docs)
         }
     }
 };
