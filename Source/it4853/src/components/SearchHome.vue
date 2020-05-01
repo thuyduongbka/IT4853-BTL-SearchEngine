@@ -1,20 +1,21 @@
 <template>
     <div class="container">
         <form>
-            <div>
-                <h1>Tìm kiếm điện thoại - So sánh giá</h1>
-            </div>
             <form @submit="submit">
                 <label></label>
                 <input v-model="test"  class="search_input" type="text" placeholder="Type anything ..." />
             </form>
-            <p>Thông điệp: {{ test }}</p>
         </form>
-        <div class="container-items" v-if="data != null">
-            <div class="items">
-                <div class="name-item">{{data}}</div>
+            <div class="container-result"  v-if="data != null">      
+                <p class="result">seach results</p> 
+                <div class="container-items">
+                    <div class="items" v-for="item in data" :key="item">
+                        <div class="name-item">{{item.name[0]}}</div>
+                        <div class="address-item">Địa chỉ: {{item.location[0]}}</div>
+                        <div class="rate-item">Đánh giá: {{item.rating_star[0]}}</div>
+                    </div>
+                </div>
             </div>
-        </div>
     </div>
 </template>
 
@@ -42,8 +43,8 @@ export default {
          if(res.status!==200){
              alert("Đã xảy ra lỗi !!!")
          }
-         this.data=res
-         console.log(this.data.data.response.docs)
+         this.data=res.data.response.docs
+         console.log(this.data)
         }
     }
 };
@@ -68,19 +69,47 @@ a {
 }
 .search_input {
     width: 50%;
-    border: solid 2px #42b983;
-    border-radius: 20px;
+    border: solid 2px #4272b9;
+    border-radius: 10px;
     padding: 20px;
 }
 input:focus {
     outline: none;
-    border: solid 2px #034427;
+    border: solid 2px #063377;
+}
+.container-result{
+    justify-content: center;
+}
+.result{
+    height: 28px;
+    font-family: SFD-Medium;
+    font-size: 20px;
+    line-height: 28px;
+    color: #f77638;
 }
 .container-items {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 .items {
-    max-width: 100px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding-right: .3125rem;
+    padding-left: .3125rem;
+    max-width: 200px;
+    margin: 10px;   
+    background: #fff;
+}
+.items:hover{
+    border: 1px solid #ee4d2d;
+    border-radius: 10px;
+}
+.name-item{
+    padding: 10px 0px;
+    font-weight: bold;
+}
+.address-item{
+    padding: 10px 0px;
 }
 </style>
