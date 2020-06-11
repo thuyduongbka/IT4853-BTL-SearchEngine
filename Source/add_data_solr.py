@@ -1,7 +1,7 @@
 import pysolr
 import json
 
-solr = pysolr.Solr('http://localhost:8983/solr/BTL/')
+solr = pysolr.Solr('http://localhost:8983/solr/phone-data/')
 with open('data.json', 'r') as json_file:
     json_object = json.load(json_file)
     solr.ping()

@@ -11,7 +11,7 @@ for page in range(MAX_PAGE):
         'by': 'sales',
         'limit': '50',
         'match_id': '1979',
-        'newest': 50 * page,
+        'newest': 50*page,
         'order': 'desc',
         'page_type': 'search',
         'version': '2',
@@ -49,8 +49,7 @@ for page in range(MAX_PAGE):
             'name': item['name'],
             'id': item['itemid'],
             'shopid': item['shopid'],
-            'location': item['shop_location'],
-            'description': item['description'],
+            'location': item['shop_location'],            
             'rating_star': item['item_rating']['rating_star']
         }        
         dataSolr.append(json_load)       

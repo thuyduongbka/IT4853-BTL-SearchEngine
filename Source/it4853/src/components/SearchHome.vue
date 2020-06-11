@@ -37,8 +37,8 @@ export default {
 
             }
             console.log(this.test)
-             event.preventDefault()
-         let res= await axios.get("http://localhost:8983/solr/test/select?indent=on&q=*"+`${this.test}`+"*&wt=json",headers)
+            event.preventDefault()
+         let res= await axios.get("http://localhost:8983/solr/BTL/select?indent=on&q=*"+`${this.test}`+"*&wt=json",headers)
          if(res.status!==200){
              alert("Đã xảy ra lỗi !!!")
          }
