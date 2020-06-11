@@ -1,22 +1,46 @@
 <template>
     <div class="container">
         <div>
-            <label></label>
+            <h1>Nhóm 5 - Tìm Kiếm Điện Thoại</h1>
+            <br />
             <input v-model="query" class="search_input" type="text" placeholder="Type anything ..." />
             <button @click="submit(0)">Search</button>
+            <button @click="hideFilter = !hideFilter ">Filter</button>
+        </div>
+        <div class="container-filter">
+            <ul class="filter filter-price" v-if="hideFilter">
+                <li
+                    v-for="(price,index) in listPrices"
+                    :key="index"
+                    @click="filterPrice=index;submit(pageCurrent)"
+                >
+                    <a>{{price.name}}</a>
+                </li>
+            </ul>
+            <ul class="filter filter-location" v-if="hideFilter">
+                <li
+                    v-for="(loc,index) in listLocations"
+                    :key="index"
+                    @click="filterLocation=index;submit(pageCurrent)"
+                >
+                    <a>{{loc.name}}</a>
+                </li>
+            </ul>
         </div>
         <div class="container-result" v-if="data != null">
-            <p class="result">Kết quả tìm kiếm</p>
+            <p class="result">Kết quả Tìm kiếm Với {{query}} - Giá:{{listPrices[filterPrice].name}} - Địa chỉ: {{listLocations[filterLocation].name}}</p>
             <div class="container-items">
                 <div class="items" v-for="item in data" :key="item.id">
                     <a
-                        :href="'https://shopee.vn/'+getLink(item.name[0])+'.'+item.shopid+'.'+item.id"
+                        :href="'https://shopee.vn/'+getLink(item.name[0])+'.'+item.shopid[0]+'.'+item.id"
                         target="_blank"
                     >
                         <img width="100%" :src="'https://cf.shopee.vn/file/'+item.image[0]" />
                         <div class="name-item">{{item.name[0]}}</div>
                         <div class="address-item">Địa chỉ: {{item.location[0]}}</div>
-                        <div class="price-item">Giá: {{item.price[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}}</div>
+                        <div
+                            class="price-item"
+                        >Giá: {{item.price[0].toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}}</div>
                         <div class="rate-item">Đánh giá: {{item.rating_star[0]}}</div>
                     </a>
                 </div>
@@ -28,13 +52,16 @@
             </span>
             <span v-for="page in pages" :key="page">
                 <span
-                    v-if="page >= pageCurrent && page < pageCurrent+6"
+                    v-if="page >= pageCurrent-3 && page < pageCurrent+4"
                     @click="submit(page)"
                     :class="{active : (pageCurrent==page)}"
                 >{{page+1}}</span>
             </span>
             <span>
-                <span @click="submit(pageCurrent+1)">&raquo;</span>
+                <span
+                    :class="{hidden : (pageCurrent >= numPage-1)}"
+                    @click="submit(pageCurrent+1)"
+                >&raquo;</span>
             </span>
         </div>
     </div>
@@ -52,7 +79,55 @@ export default {
             numFound: 0,
             numPage: 0,
             pageCurrent: 0,
-            pages: []
+            pages: [],
+            hideFilter: false,
+            filterPrice: 0,
+            filterLocation: 0,
+
+            listPrices: [
+                {
+                    name: "Tất cả mức giá",
+                    query: ""
+                },
+                {
+                    name: "< 2.000.000",
+                    query: "price:[*%20TO%202000000]"
+                },
+                {
+                    name: "2.000.000 - 5.000.000",
+                    query: "price:[2000000%20TO%205000000]"
+                },
+                {
+                    name: "5.000.000 - 10.000.000",
+                    query: "price:[5000000%20TO%2010000000]"
+                },
+                {
+                    name: "> 10.000.000",
+                    query: "price:[10000000%20TO%20*]"
+                }
+            ],
+            listLocations: [
+                {
+                    name: "Tất cả các vùng",
+                    query: ""
+                },
+                {
+                    name: "Hà Nội",
+                    query: "hà%20nội+"
+                },
+                {
+                    name: "Hồ Chí Minh",
+                    query: "ho%20chi%20minh+"
+                },
+                {
+                    name: "Đà nẵng",
+                    query: "đà%20nẵng+"
+                },
+                {
+                    name: "Cần Thơ",
+                    query: "cần%20thơ+"
+                }
+            ]
         };
     },
     methods: {
@@ -62,11 +137,14 @@ export default {
                 "Content-Type": "application/json"
             };
             let res = await axios.get(
-                "http://localhost:8983/solr/phone-data/select?indent=on&q=*" +
-                    `${this.query}` +
-                    "*&wt=json" +
+                "http://localhost:8983/solr/phone-data/select?indent=on&" +
+                    "q=" +
+                    this.query + " " + this.listLocations[this.filterLocation].query +
+                    "&wt=json" +
                     "&start=" +
-                    page * 10,
+                    page * 10 +
+                    "&fq=" +
+                    this.listPrices[this.filterPrice].query,                    
                 headers
             );
             if (res.status !== 200) {
@@ -74,6 +152,7 @@ export default {
             }
 
             this.data = res.data.response.docs;
+            console.log(this.data);
             this.numFound = res.data.response.numFound;
             this.numPage = this.numFound / 10;
             this.pageCurrent = page;
@@ -112,16 +191,28 @@ li {
 a {
     color: #42b983;
     text-decoration: none;
+    cursor: pointer;
+}
+button {
+    border: solid 2px #ee4d2d;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #ee4d2d;
+    color: #ffffff;
+}
+button:hover {
+    background-color: #4caf50;
+    border: solid 2px #4caf50;
 }
 .search_input {
     width: 50%;
-    border: solid 2px #4272b9;
+    border: solid 2px #ee4d2d;
     border-radius: 10px;
     padding: 20px;
 }
 input:focus {
     outline: none;
-    border: solid 2px #063377;
+    border: solid 2px #ee4d2d;
 }
 .container-result {
     justify-content: center;
@@ -181,5 +272,23 @@ input:focus {
 }
 .hidden {
     visibility: hidden;
+}
+.container-filter {
+    margin: 50px;
+    /* text-align: left; */
+    display: flex;
+    flex-wrap: wrap;
+}
+.filter {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+.filter li {
+    margin: 10px;    
+}
+.filter li:hover {
+    border: 1px solid #ee4d2d;
+    padding: 5px;
 }
 </style>

@@ -31,7 +31,6 @@ for page in range(MAX_PAGE):
     }
     response = requests.get(url=URL, headers=HEADER, params=PARAMS)
     print(response)
-
     data = response.json()
     items = data['items']
 
@@ -54,22 +53,9 @@ for page in range(MAX_PAGE):
             'image': item['images'][0],
             'price': item['price']//100000
         }        
+
         dataSolr.append(json_load)       
 
 with open('data.json', 'w') as outfile:
     json.dump(dataSolr, outfile)
 
-# print("Name: ",item['name'])
-# # print("Location: ",item['shop_location'])
-# # print("Price: ",item['price'])
-# # print("Price Max: ",item['price_max'])
-# # print("Price Min: ",item['price_min'])
-# # print("Brand: ",item['brand'])
-# # print("view_count: ", item['view_count'])
-# # print("item_rating: ", item['item_rating'])
-# # print("description", item['description'])
-# # print("liked_count", item['liked_count'])
-# # print("historical_sold", item['historical_sold'])
-# # print("categories", item['categories'])
-# # print("attributes", item['attributes'])
-# print()
