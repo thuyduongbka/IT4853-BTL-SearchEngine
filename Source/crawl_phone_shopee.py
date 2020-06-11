@@ -3,7 +3,7 @@ import json
 
 dataSolr = []
 
-MAX_PAGE = 50
+MAX_PAGE = 100
 for page in range(MAX_PAGE):
     print(page)
     URL = "https://shopee.vn/api/v2/search_items/"
@@ -50,7 +50,9 @@ for page in range(MAX_PAGE):
             'id': item['itemid'],
             'shopid': item['shopid'],
             'location': item['shop_location'],            
-            'rating_star': item['item_rating']['rating_star']
+            'rating_star': item['item_rating']['rating_star'],
+            'image': item['images'][0],
+            'price': item['price']//100000
         }        
         dataSolr.append(json_load)       
 
